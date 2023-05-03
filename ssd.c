@@ -378,7 +378,7 @@ uint64_t ssd_advance_nand(struct ssd *ssd, struct nand_cmd *ncmd)
 	struct ppa *ppa = ncmd->ppa;
 	uint32_t cell;
 	NVMEV_DEBUG(
-		"SSD: %p, Enter stime: %lld, ch %lu lun %lu blk %lu page %lu command %d ppa 0x%llx\n",
+		"SSD: %p, Enter stime: %lld, ch %d lun %d blk %d page %d command %d ppa 0x%llx\n",
 		ssd, ncmd->stime, ppa->g.ch, ppa->g.lun, ppa->g.blk, ppa->g.pg, c, ppa->ppa);
 
 	if (ppa->ppa == UNMAPPED_PPA) {
@@ -395,8 +395,7 @@ uint64_t ssd_advance_nand(struct ssd *ssd, struct nand_cmd *ncmd)
 	switch (c) {
 	case NAND_READ:
 		/* read: perform NAND cmd first */
-		nand_stime = (lun->next_lun_avail_time < cmd_stime) ? cmd_stime :
-								      lun->next_lun_avail_time;
+		nand_stime = max(lun->next_lun_avail_time, cmd_stime);
 
 		if (ncmd->xfer_size == 4096) {
 			nand_etime = nand_stime + spp->pg_4kb_rd_lat[cell];
@@ -426,8 +425,7 @@ uint64_t ssd_advance_nand(struct ssd *ssd, struct nand_cmd *ncmd)
 
 	case NAND_WRITE:
 		/* write: transfer data through channel first */
-		chnl_stime = (lun->next_lun_avail_time < cmd_stime) ? cmd_stime :
-								      lun->next_lun_avail_time;
+		chnl_stime = max(lun->next_lun_avail_time, cmd_stime);
 
 		chnl_etime = chmodel_request(ch->perf_model, chnl_stime, ncmd->xfer_size);
 
@@ -440,8 +438,7 @@ uint64_t ssd_advance_nand(struct ssd *ssd, struct nand_cmd *ncmd)
 
 	case NAND_ERASE:
 		/* erase: only need to advance NAND status */
-		nand_stime = (lun->next_lun_avail_time < cmd_stime) ? cmd_stime :
-								      lun->next_lun_avail_time;
+		nand_stime = max(lun->next_lun_avail_time, cmd_stime);
 		nand_etime = nand_stime + spp->blk_er_lat;
 		lun->next_lun_avail_time = nand_etime;
 		completed_time = nand_etime;
@@ -449,8 +446,7 @@ uint64_t ssd_advance_nand(struct ssd *ssd, struct nand_cmd *ncmd)
 
 	case NAND_NOP:
 		/* no operation: just return last completed time of lun */
-		nand_stime = (lun->next_lun_avail_time < cmd_stime) ? cmd_stime :
-								      lun->next_lun_avail_time;
+		nand_stime = max(lun->next_lun_avail_time, cmd_stime);
 		lun->next_lun_avail_time = nand_stime;
 		completed_time = nand_stime;
 		break;

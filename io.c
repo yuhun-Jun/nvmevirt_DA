@@ -21,7 +21,7 @@ struct buffer;
 #define sq_entry(entry_id) sq->sq[SQ_ENTRY_TO_PAGE_NUM(entry_id)][SQ_ENTRY_TO_PAGE_OFFSET(entry_id)]
 #define cq_entry(entry_id) cq->cq[CQ_ENTRY_TO_PAGE_NUM(entry_id)][CQ_ENTRY_TO_PAGE_OFFSET(entry_id)]
 
-int io_using_dma = false;
+extern bool io_using_dma;
 
 static inline unsigned int __get_io_worker(int sqid)
 {
@@ -294,9 +294,8 @@ void enqueue_writeback_io_req(int sqid, unsigned long long nsecs_target,
 	pi->free_seq = pi->proc_table[entry].next;
 	BUG_ON(pi->free_seq >= NR_MAX_PARALLEL_IO);
 
-	NVMEV_DEBUG("%s/%u[%d], sq %d cq %d, entry %d %llu + %llu\n", pi->thread_name, entry,
-		    sq_entry(sq_entry).rw.opcode, sqid, cqid, sq_entry, nsecs_start,
-		    ret->nsecs_target - nsecs_start);
+	NVMEV_DEBUG("%s/%u, writeback sq %d %llu + %llu\n", pi->thread_name, entry,
+		    sqid, local_clock(), nsecs_target - local_clock());
 
 	/////////////////////////////////
 	pi->proc_table[entry].sqid = sqid;
