@@ -1273,6 +1273,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 //yuhun
 
 	NVMEV_DEBUG("conv_write: start_lpn=%lld, len=%lld, end_lpn=%lld", start_lpn, nr_lba, end_lpn);
+	NVMEV_ERROR("conv_write: start_lpn=%lld, len=%lld, end_lpn=%lld", start_lpn, nr_lba, end_lpn);
 	if ((end_lpn / nr_parts) >= spp->tt_pgs) {
 		NVMEV_ERROR("conv_write: lpn passed FTL range(start_lpn=%lld,tt_pgs=%ld)\n",
 			    start_lpn, spp->tt_pgs);
@@ -1280,6 +1281,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 	}
 
 	allocated_buf_size = buffer_allocate(wbuf, LBA_TO_BYTE(nr_lba));
+	NVMEV_ERROR("conv_write: buffer alloc size = %u\n", allocated_buf_size);
 	if (allocated_buf_size < LBA_TO_BYTE(nr_lba))
 		return false;
 
@@ -1303,8 +1305,10 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 			NVMEV_DEBUG("conv_write: %lld is invalid, ", ppa2pgidx(conv_ftl, &ppa));
 		}
 
-#define DIEAFFINITY (1)
 //yuhun
+#define DIEAFFINITY (1)
+
+
 		/* new write */
 		//need branch
 		if (lpn == start_lpn)
@@ -1312,29 +1316,27 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 			if (bAppend)
 			{
 				ppa = get_maptbl_ent(conv_ftl, plpn); 
-				if (mapped_ppa(&ppa)) {
-					//conv_ftl->lunpointer = get_glun(conv_ftl, &ppa); 
+				if (mapped_ppa(&ppa)) {		
+					uint32_t originlun = conv_ftl->lunpointer;
+					conv_ftl->lunpointer = get_glun(conv_ftl, &ppa); 
+					//advance lun for append
+					conv_ftl->lunpointer++;
+					if (conv_ftl->lunpointer == (conv_ftl->ssd->sp.nchs * conv_ftl->ssd->sp.luns_per_ch))
+						conv_ftl->lunpointer = 0;
+					//					
+					NVMEV_ERROR("target lun: %d -> %d\n", originlun, conv_ftl->lunpointer);
 				}
 			}
 			else if (bOverwrite)
 			{				
 				ppa = get_maptbl_ent(conv_ftl, lpn); 
 				if (mapped_ppa(&ppa)) {
-					//conv_ftl->lunpointer = get_glun(conv_ftl, &ppa); 
+					uint32_t originlun = conv_ftl->lunpointer;
+					conv_ftl->lunpointer = get_glun(conv_ftl, &ppa); 
+					NVMEV_ERROR("target lun: %d -> %d\n", originlun, conv_ftl->lunpointer);
 				}
 			}
 		}
-		//test code
-		if (lpn%2)
-		{
-			conv_ftl->lunpointer =lpn%2;
-			NVMEV_ERROR("lpn = %lld,  set lunpointer :%d\n", lpn, conv_ftl->lunpointer);
-		}
-		else
-		{
-			;
-		}	
-		//test code
 
 #if (DIEAFFINITY == 0)
 		ppa = get_new_page(conv_ftl, USER_IO);
@@ -1370,10 +1372,23 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 
 			nsecs_completed = ssd_advance_nand(conv_ftl->ssd, &swr);
 			nsecs_latest = max(nsecs_completed, nsecs_latest);
-
+			
+// yuhun remove origin release path
+#if (DIEAFFINITY == 0)
 			enqueue_writeback_io_req(req->sq_id, nsecs_completed, wbuf,
-						 spp->pgs_per_oneshotpg * spp->pgsz);
+			 			 spp->pgs_per_oneshotpg * spp->pgsz);
+#endif
+// yuhun 
+
 		}
+//yuhun 
+		//buffer release per page, 
+		//buffer should be released after pagewrite, but DA time we release to implement
+#if (DIEAFFINITY == 1)
+		enqueue_writeback_io_req(req->sq_id, nsecs_completed, wbuf,
+						 spp->pgsz);
+#endif
+//yuhun
 
 		consume_write_credit(conv_ftl);
 		check_and_refill_write_credit(conv_ftl);
