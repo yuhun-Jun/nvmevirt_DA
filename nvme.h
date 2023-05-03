@@ -346,7 +346,7 @@ struct nvme_rw_command {
 	__u8 flags;
 	__u16 command_id;
 	__le32 nsid;
-	__u64 rsvd2;
+	__le64 pslba; //yuhun
 	__le64 metadata;
 	__le64 prp1;
 	__le64 prp2;
@@ -387,6 +387,12 @@ struct nvme_get_log_page_command {
 enum {
 	NVME_RW_LR = 1 << 15,
 	NVME_RW_FUA = 1 << 14,
+//yuhun
+	NVME_RW_APPEND				= 1 << 8,
+	NVME_RW_OVERWRITE			= 1 << 9,
+//yuhun
+
+
 	NVME_RW_DSM_FREQ_UNSPEC = 0,
 	NVME_RW_DSM_FREQ_TYPICAL = 1,
 	NVME_RW_DSM_FREQ_RARE = 2,

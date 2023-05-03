@@ -62,13 +62,13 @@ enum {
 #define NS_SSD_TYPE_1 NS_SSD_TYPE_0
 #define NS_CAPACITY_1 (0)
 #define MDTS (6)
-#define CELL_MODE (CELL_MODE_MLC)
+#define CELL_MODE (CELL_MODE_SLC)
 
-#define SSD_PARTITIONS (4)
-#define NAND_CHANNELS (8)
+#define SSD_PARTITIONS (1)
+#define NAND_CHANNELS (4)
 #define LUNS_PER_NAND_CH (2)
 #define PLNS_PER_LUN (1)
-#define FLASH_PAGE_SIZE KB(32)
+#define FLASH_PAGE_SIZE KB(16)
 #define ONESHOT_PAGE_SIZE (FLASH_PAGE_SIZE * 1)
 #define BLKS_PER_PLN (8192)
 #define BLK_SIZE (0) /*BLKS_PER_PLN should not be 0 */
