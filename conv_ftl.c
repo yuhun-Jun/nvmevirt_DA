@@ -335,7 +335,7 @@ static void prepare_write_pointer_DA(struct conv_ftl *conv_ftl, uint32_t io_type
 	{
 		struct write_pointer *wp = __get_wp_DA(conv_ftl, io_type, lun);
 
-		NVMEV_ERROR("wpp lun:%d, ch: %d, lun: %d\n", lun, wp->ch, wp->lun);
+		//NVMEV_ERROR("wpp lun:%d, ch: %d, lun: %d\n", lun, wp->ch, wp->lun);
 	}
 
 }
@@ -476,7 +476,7 @@ static void advance_write_pointer_DA(struct conv_ftl *conv_ftl, uint32_t io_type
 		goto out;
 	}
 
-	NVMEV_ERROR("lun limit\n");
+	//NVMEV_ERROR("lun limit\n");
 	glun=0;	
 	conv_ftl->lunpointer = glun; //next write lun 
 	lm = conv_ftl->lunlm+conv_ftl->lunpointer;
@@ -1118,6 +1118,7 @@ static void forground_gc(struct conv_ftl *conv_ftl)
 {
 	if (should_gc_high(conv_ftl)) {
 		NVMEV_DEBUG("should_gc_high passed");
+		NVMEV_ERROR("should_gc_high passed, FGGC");
 		/* perform GC here until !should_gc(conv_ftl) */
 		do_gc(conv_ftl, true);
 	}
@@ -1264,16 +1265,16 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 	{
 		plba = cmd->rw.pslba;
 		plpn = plba / spp->secs_per_pg;
-		NVMEV_ERROR("[NVMEVIRT]_AP, plba = %llu\n", plba);
+		//NVMEV_ERROR("[NVMEVIRT]_AP, plba = %llu\n", plba);
 	}	
 	if (bOverwrite)
 	{
-		NVMEV_ERROR("[NVMEVIRT]_OW\n");
+		//NVMEV_ERROR("[NVMEVIRT]_OW\n");
 	}
 //yuhun
 
 	NVMEV_DEBUG("conv_write: start_lpn=%lld, len=%lld, end_lpn=%lld", start_lpn, nr_lba, end_lpn);
-	NVMEV_ERROR("conv_write: start_lpn=%lld, len=%lld, end_lpn=%lld", start_lpn, nr_lba, end_lpn);
+	//NVMEV_ERROR("conv_write: start_lpn=%lld, len=%lld, end_lpn=%lld", start_lpn, nr_lba, end_lpn);
 	if ((end_lpn / nr_parts) >= spp->tt_pgs) {
 		NVMEV_ERROR("conv_write: lpn passed FTL range(start_lpn=%lld,tt_pgs=%ld)\n",
 			    start_lpn, spp->tt_pgs);
@@ -1281,7 +1282,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 	}
 
 	allocated_buf_size = buffer_allocate(wbuf, LBA_TO_BYTE(nr_lba));
-	NVMEV_ERROR("conv_write: buffer alloc size = %u\n", allocated_buf_size);
+	//NVMEV_ERROR("conv_write: buffer alloc size = %u\n", allocated_buf_size);
 	if (allocated_buf_size < LBA_TO_BYTE(nr_lba))
 		return false;
 
@@ -1306,7 +1307,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 		}
 
 //yuhun
-#define DIEAFFINITY (1)
+#define DIEAFFINITY (0)
 
 
 		/* new write */
@@ -1324,7 +1325,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 					if (conv_ftl->lunpointer == (conv_ftl->ssd->sp.nchs * conv_ftl->ssd->sp.luns_per_ch))
 						conv_ftl->lunpointer = 0;
 					//					
-					NVMEV_ERROR("target lun: %d -> %d\n", originlun, conv_ftl->lunpointer);
+					//NVMEV_ERROR("target lun: %d -> %d\n", originlun, conv_ftl->lunpointer);
 				}
 			}
 			else if (bOverwrite)
@@ -1333,7 +1334,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 				if (mapped_ppa(&ppa)) {
 					uint32_t originlun = conv_ftl->lunpointer;
 					conv_ftl->lunpointer = get_glun(conv_ftl, &ppa); 
-					NVMEV_ERROR("target lun: %d -> %d\n", originlun, conv_ftl->lunpointer);
+					//NVMEV_ERROR("target lun: %d -> %d\n", originlun, conv_ftl->lunpointer);
 				}
 			}
 		}
@@ -1344,7 +1345,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 		ppa = get_new_page_DA(conv_ftl, USER_IO);
 #endif
 
-		NVMEV_ERROR("PPA: ch:%d, lun:%d, blk:%d, pg:%d \n", ppa.g.ch, ppa.g.lun, ppa.g.blk, ppa.g.pg );
+		//NVMEV_ERROR("PPA: ch:%d, lun:%d, blk:%d, pg:%d \n", ppa.g.ch, ppa.g.lun, ppa.g.blk, ppa.g.pg );
 
 //yuhun
 
