@@ -12,4 +12,4 @@ All changes are annotated with "//66f1" before and after.
 - Added additional fields to the NVMe Command structure.
 
 ### ssd.c, ssd.h
-- Introduced die-specific information.
+- Added die-specific information to the SSD structure.
