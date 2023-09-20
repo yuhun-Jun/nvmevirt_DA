@@ -65,11 +65,11 @@ struct conv_ftl {
 	struct write_pointer gc_wp;
 	struct line_mgmt lm;
 	struct write_flow_control wfc;
-	//yuhun
+	//66f1
 	struct line_mgmt *lunlm;
 	struct write_pointer *lunwp;
 	uint32_t lunpointer;
-	//yuhun
+	//66f1
 
 };
 

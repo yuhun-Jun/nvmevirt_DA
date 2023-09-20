@@ -156,12 +156,12 @@ void ssd_init_params(struct ssdparams *spp, uint64_t capacity, uint32_t nparts)
 	spp->tt_lines = spp->blks_per_lun;
 	/* TODO: to fix under multiplanes */ // lun size is super-block(line) size
 	
-	//yuhun die line option
+	//66f1 die line option
 	spp->blks_per_lun_line = spp->pls_per_lun;
 	spp->pgs_per_lun_line = spp->blks_per_lun_line * spp->pgs_per_blk;
 	spp->secs_per_lun_line = spp->pgs_per_lun_line * spp->secs_per_pg;
 	spp->tt_lun_lines = spp->blks_per_lun_line;
-	//yuhun
+	//66f1
 
 
 	check_params(spp);

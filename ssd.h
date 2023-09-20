@@ -202,12 +202,12 @@ struct ssdparams {
 	unsigned long blks_per_line;
 	unsigned long tt_lines;
 
-//yuhun
+//66f1
 	unsigned long secs_per_lun_line;
 	unsigned long pgs_per_lun_line;
 	unsigned long blks_per_lun_line;
 	unsigned long tt_lun_lines;
-//yuhun
+//66f1
 
 	unsigned long pls_per_ch; /* # of planes per channel */
 	unsigned long tt_pls; /* total # of planes in the SSD */

@@ -147,7 +147,7 @@ static void init_lines(struct conv_ftl *conv_ftl)
 	lm->full_line_cnt = 0;
 }
 
-//yuhun
+//66f1
 static void init_lines_DA(struct conv_ftl *conv_ftl)
 {
 	struct ssdparams *spp = &conv_ftl->ssd->sp;
@@ -192,7 +192,7 @@ static void init_lines_DA(struct conv_ftl *conv_ftl)
 
 	}
 }
-//yuhun
+//66f1
 
 static void remove_lines(struct conv_ftl *conv_ftl)
 {
@@ -242,7 +242,7 @@ static struct line *get_next_free_line(struct conv_ftl *conv_ftl)
 	return curline;
 }
 
-//yuhun
+//66f1
 static struct line *get_next_free_line_DA(struct conv_ftl *conv_ftl, uint32_t lun)
 {
 	struct line_mgmt *lm = conv_ftl->lunlm+lun;
@@ -258,7 +258,7 @@ static struct line *get_next_free_line_DA(struct conv_ftl *conv_ftl, uint32_t lu
 	NVMEV_DEBUG("[%s] free_line_cnt %d\n", __FUNCTION__, lm->free_line_cnt);
 	return curline;
 }
-//yuhun
+//66f1
 
 static struct write_pointer *__get_wp(struct conv_ftl *ftl, uint32_t io_type)
 {
@@ -271,7 +271,7 @@ static struct write_pointer *__get_wp(struct conv_ftl *ftl, uint32_t io_type)
 	NVMEV_ASSERT(0);
 	return NULL;
 }
-//yuhun
+//66f1
 static struct write_pointer *__get_wp_DA(struct conv_ftl *ftl, uint32_t io_type, uint32_t lun)
 {
 	if (io_type == USER_IO) {
@@ -283,7 +283,7 @@ static struct write_pointer *__get_wp_DA(struct conv_ftl *ftl, uint32_t io_type,
 	NVMEV_ASSERT(0);
 	return NULL;
 }
-//yuhun
+//66f1
 
 static void prepare_write_pointer(struct conv_ftl *conv_ftl, uint32_t io_type)
 {
@@ -304,7 +304,7 @@ static void prepare_write_pointer(struct conv_ftl *conv_ftl, uint32_t io_type)
 	};
 }
 
-//yuhun
+//66f1
 static void prepare_write_pointer_DA(struct conv_ftl *conv_ftl, uint32_t io_type)
 {
 	uint32_t luncount = conv_ftl->ssd->sp.luns_per_ch * conv_ftl->ssd->sp.nchs;
@@ -339,7 +339,7 @@ static void prepare_write_pointer_DA(struct conv_ftl *conv_ftl, uint32_t io_type
 	}
 
 }
-//yuhun
+//66f1
 
 static void advance_write_pointer(struct conv_ftl *conv_ftl, uint32_t io_type)
 {
@@ -409,7 +409,7 @@ out:
 		    wpp->lun, wpp->pl, wpp->blk, wpp->pg, wpp->curline->id);
 }
 
-//yuhun
+//66f1
 static void advance_write_pointer_DA(struct conv_ftl *conv_ftl, uint32_t io_type)
 {
 	uint32_t glun=conv_ftl->lunpointer;	
@@ -486,7 +486,7 @@ out:
 	NVMEV_DEBUG("advanced wpp: ch:%d, lun:%d, pl:%d, blk:%d, pg:%d (curline %d)\n", wpp->ch,
 		    wpp->lun, wpp->pl, wpp->blk, wpp->pg, wpp->curline->id);
 }
-//yuhun
+//66f1
 
 static struct ppa get_new_page(struct conv_ftl *conv_ftl, uint32_t io_type)
 {
@@ -574,19 +574,19 @@ static void conv_init_ftl(struct conv_ftl *conv_ftl, struct convparams *cpp, str
 	NVMEV_INFO("initialize lines\n");
 	init_lines(conv_ftl);
 
-//yuhun
+//66f1
 	init_lines_DA(conv_ftl);
-//yuhun
+//66f1
 
 	/* initialize write pointer, this is how we allocate new pages for writes */
 	NVMEV_INFO("initialize write pointer\n");
 	prepare_write_pointer(conv_ftl, USER_IO);
 	prepare_write_pointer(conv_ftl, GC_IO);
 
-//yuhun
+//66f1
 	prepare_write_pointer_DA(conv_ftl, USER_IO);
 	conv_ftl->lunpointer = 0;
-//yuhun
+//66f1
 
 	init_write_flow_control(conv_ftl);
 
@@ -599,9 +599,9 @@ static void conv_init_ftl(struct conv_ftl *conv_ftl, struct convparams *cpp, str
 static void conv_remove_ftl(struct conv_ftl *conv_ftl)
 {
 	remove_lines(conv_ftl);
-	//yuhun
+	//66f1
 	remove_lines_DA(conv_ftl);
-	//yuhun
+	//66f1
 	remove_rmap(conv_ftl);
 	remove_maptbl(conv_ftl);
 }
@@ -631,10 +631,10 @@ void conv_init_namespace(struct nvmev_ns *ns, uint32_t id, uint64_t size, void *
 	conv_ftls = kmalloc(sizeof(struct conv_ftl) * nr_parts, GFP_KERNEL);
 
 	for (i = 0; i < nr_parts; i++) {
-//yuhun
+//66f1
 		conv_ftls[i].lunlm = kmalloc(sizeof(struct line_mgmt) * NAND_CHANNELS * LUNS_PER_NAND_CH, GFP_KERNEL);
 		conv_ftls[i].lunwp = kmalloc(sizeof(struct write_pointer) * NAND_CHANNELS * LUNS_PER_NAND_CH, GFP_KERNEL);
-//yuhun
+//66f1
 		ssd = kmalloc(sizeof(struct ssd), GFP_KERNEL);
 		ssd_init(ssd, &spp, cpu_nr_dispatcher);
 		conv_init_ftl(&conv_ftls[i], &cpp, ssd);
@@ -680,10 +680,10 @@ void conv_remove_namespace(struct nvmev_ns *ns)
 		conv_ftls[i].ssd->pcie = NULL;
 		conv_ftls[i].ssd->write_buffer = NULL;
 		
-		//yuhun
+		//66f1
 		kfree(conv_ftls[i].lunlm);
 		kfree(conv_ftls[i].lunwp);
-		//yuhun
+		//66f1
 	}
 
 	for (i = 0; i < nr_parts; i++) {
@@ -753,10 +753,10 @@ static void mark_page_invalid(struct conv_ftl *conv_ftl, struct ppa *ppa)
 {
 	struct ssdparams *spp = &conv_ftl->ssd->sp;
 	struct line_mgmt *lm = &conv_ftl->lm;
-	//yuhun
+	//66f1
 	uint32_t glun = get_glun(conv_ftl, ppa);
 	struct line_mgmt *lunlm = conv_ftl->lunlm+glun;
-	//yuhun
+	//66f1
 	struct nand_block *blk = NULL;
 	struct nand_page *pg = NULL;
 	bool was_full_line = false;
@@ -799,7 +799,7 @@ static void mark_page_invalid(struct conv_ftl *conv_ftl, struct ppa *ppa)
 		lm->victim_line_cnt++;
 	}
 
-	//yuhun lunlm update
+	//66f1 lunlm update
 	was_full_line = false;
 	/* update corresponding line status */
 	line = get_line_DA(conv_ftl, ppa);
@@ -825,7 +825,7 @@ static void mark_page_invalid(struct conv_ftl *conv_ftl, struct ppa *ppa)
 		pqueue_insert(lunlm->victim_line_pq, line);
 		lunlm->victim_line_cnt++;
 	}
-	//yuhun
+	//66f1
 }
 
 static void mark_page_valid(struct conv_ftl *conv_ftl, struct ppa *ppa)
@@ -850,11 +850,11 @@ static void mark_page_valid(struct conv_ftl *conv_ftl, struct ppa *ppa)
 	NVMEV_ASSERT(line->vpc >= 0 && line->vpc < spp->pgs_per_line);
 	line->vpc++;
 
-	//yuhun
+	//66f1
 	line = get_line_DA(conv_ftl, ppa);
 	NVMEV_ASSERT(line->vpc >= 0 && line->vpc < spp->pgs_per_line);
 	line->vpc++;
-	//yuhun
+	//66f1
 }
 
 static void mark_block_free(struct conv_ftl *conv_ftl, struct ppa *ppa)
@@ -1246,13 +1246,13 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 	uint64_t nsecs_latest;
 	uint64_t nsecs_xfer_completed;
 	uint32_t allocated_buf_size;
-//yuhun
+//66f1
 	uint16_t bOverwrite = (cmd->rw.control & NVME_RW_OVERWRITE) ? 1 : 0;
 	uint16_t bAppend = (cmd->rw.control & NVME_RW_APPEND) ? 1 : 0;
 
 	uint64_t plba = 0;
 	uint64_t plpn = 0;
-//yuhun
+//66f1
 
 	struct nand_cmd swr = {
 		.type = USER_IO,
@@ -1260,7 +1260,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 		.interleave_pci_dma = false,
 		.xfer_size = spp->pgsz * spp->pgs_per_oneshotpg,
 	};
-//yuhun
+//66f1
 	if (bAppend)
 	{
 		plba = cmd->rw.pslba;
@@ -1271,7 +1271,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 	{
 		//NVMEV_ERROR("[NVMEVIRT]_OW\n");
 	}
-//yuhun
+//66f1
 
 	NVMEV_DEBUG("conv_write: start_lpn=%lld, len=%lld, end_lpn=%lld", start_lpn, nr_lba, end_lpn);
 	//NVMEV_ERROR("conv_write: start_lpn=%lld, len=%lld, end_lpn=%lld", start_lpn, nr_lba, end_lpn);
@@ -1306,7 +1306,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 			NVMEV_DEBUG("conv_write: %lld is invalid, ", ppa2pgidx(conv_ftl, &ppa));
 		}
 
-//yuhun
+//66f1
 #define DIEAFFINITY (0)
 
 
@@ -1347,7 +1347,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 
 		//NVMEV_ERROR("PPA: ch:%d, lun:%d, blk:%d, pg:%d \n", ppa.g.ch, ppa.g.lun, ppa.g.blk, ppa.g.pg );
 
-//yuhun
+//66f1
 
 		/* update maptbl */
 		set_maptbl_ent(conv_ftl, local_lpn, &ppa);
@@ -1359,13 +1359,13 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 
 		/* need to advance the write pointer here */
 		//need branch
-//yuhun
+//66f1
 #if (DIEAFFINITY == 0)
 		advance_write_pointer(conv_ftl, USER_IO);
 #else
 		advance_write_pointer_DA(conv_ftl, USER_IO);
 #endif
-//yuhun
+//66f1
 
 		/* Aggregate write io in flash page */
 		if (last_pg_in_wordline(conv_ftl, &ppa)) {
@@ -1374,22 +1374,22 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 			nsecs_completed = ssd_advance_nand(conv_ftl->ssd, &swr);
 			nsecs_latest = max(nsecs_completed, nsecs_latest);
 			
-// yuhun remove origin release path
+// 66f1 remove origin release path
 #if (DIEAFFINITY == 0)
 			enqueue_writeback_io_req(req->sq_id, nsecs_completed, wbuf,
 			 			 spp->pgs_per_oneshotpg * spp->pgsz);
 #endif
-// yuhun 
+// 66f1 
 
 		}
-//yuhun 
+//66f1 
 		//buffer release per page, 
 		//buffer should be released after pagewrite, but DA time we release to implement
 #if (DIEAFFINITY == 1)
 		enqueue_writeback_io_req(req->sq_id, nsecs_completed, wbuf,
 						 spp->pgsz);
 #endif
-//yuhun
+//66f1
 
 		consume_write_credit(conv_ftl);
 		check_and_refill_write_credit(conv_ftl);
