@@ -7,6 +7,13 @@ CONFIG_NVMEVIRT_SSD := y
 #CONFIG_NVMEVIRT_ZNS := y
 #CONFIG_NVMEVIRT_KV := y
 
+ifeq ($(APPROACH),on)
+ccflags-y += -DDIEAFFINITY=1
+endif
+
+ifeq ($(APPROACH),off)
+ccflags-y += -DDIEAFFINITY=0
+endif
 
 obj-m   := nvmev.o
 nvmev-objs := main.o pci.o admin.o io.o dma.o

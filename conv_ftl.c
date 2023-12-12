@@ -1307,8 +1307,7 @@ static bool conv_write(struct nvmev_ns *ns, struct nvmev_request *req, struct nv
 		}
 
 //66f1
-#define DIEAFFINITY (0)
-
+//#define DIEAFFINITY (0)
 
 		/* new write */
 		//need branch
